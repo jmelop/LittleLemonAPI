@@ -1,0 +1,57 @@
+/api/users - POST
+
+/api/users/users/me/ - GET
+
+/token/login/ - POST
+
+/api/menu-items - GET
+
+/api/menu-items - POST, PUT, PATCH, DELETE
+
+/api/menu-items/{menuItem} - GET
+
+/api/menu-items/{menuItem} - POST, PUT, PATCH, DELETE
+
+/api/menu-items - GET
+
+/api/menu-items - POST
+
+/api/menu-items/{menuItem} - GET
+
+/api/menu-items/{menuItem} - PUT, PATCH
+
+/api/menu-items/{menuItem} - DELETE
+
+/api/groups/manager/users - GET
+
+/api/groups/manager/users - POST
+
+/api/groups/manager/users/{userId} - DELETE
+
+/api/groups/delivery-crew/users - GET
+
+/api/groups/delivery-crew/users - POST
+
+/api/groups/delivery-crew/users/{userId} - DELETE
+
+/api/cart/menu-items - GET
+
+/api/cart/menu-items - POST
+
+/api/cart/menu-items - DELETE
+
+/api/orders - GET
+
+/api/orders - POST
+
+/api/orders/{orderId} - GET
+
+/api/orders - GET
+
+/api/orders/{orderId} - PUT, PATCH
+
+/api/orders/{orderId} - DELETE
+
+/api/orders - GET
+
+/api/orders/{orderId} - PATCH
