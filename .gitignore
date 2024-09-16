@@ -1,4 +1,51 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
-# venv
-/.venv
+# Virtual environment
+venv/
+env/
+ENV/
+.venv/
+.ENV/
+
+# Python files
+*.py[cod]
+__pycache__/
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# OS system files
+*.DS_Store
+*.swp
+*.swo
+*.swn
+*.sublime-project
+*.sublime-workspace
+Thumbs.db
+
+# Local database files
+db.sqlite3
+*.sqlite3
+
+# Log files and folders
+*.log
+logs/
+*.out
+
+# Django migration files
+*/migrations/*
+
+# PyCharm/VSCode settings
+.idea/
+.vscode/
+
+# Third-party config files
+.env
+.env.*
+*.ini
+
+# Uploaded media files
+/media/
