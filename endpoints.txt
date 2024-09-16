@@ -12,7 +12,7 @@
 
 /api/menu-items/{menuItem} - POST, PUT, PATCH, DELETE
 
-/api/menu-items - GET
+/api/menu-items - GET ✅
 
 /api/menu-items - POST
 
