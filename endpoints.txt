@@ -1,10 +1,8 @@
 /api/users - POST
 
-/api/users/users/me/ - GET
+/api/users/users/me/ - GET ✅
 
 /token/login/ - POST
-
-/api/menu-items - GET
 
 /api/menu-items - POST, PUT, PATCH, DELETE
 
