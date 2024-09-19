@@ -1,10 +1,18 @@
+//
+// API endpoints 
+//
+
 /api/users - POST
 
-/api/users/users/me/ - GET
+/api/users/users/me/ - GET ✅
 
 /token/login/ - POST
 
-/api/menu-items - GET
+//
+// Menu-items endpoints
+//
+
+/api/menu-items - GET ✅
 
 /api/menu-items - POST, PUT, PATCH, DELETE
 
@@ -22,6 +30,10 @@
 
 /api/menu-items/{menuItem} - DELETE
 
+//
+// User group management endpoints
+//
+
 /api/groups/manager/users - GET
 
 /api/groups/manager/users - POST
@@ -34,11 +46,19 @@
 
 /api/groups/delivery-crew/users/{userId} - DELETE
 
+//
+// Cart management endpoints 
+//
+
 /api/cart/menu-items - GET
 
 /api/cart/menu-items - POST
 
 /api/cart/menu-items - DELETE
+
+//
+// Order management endpoints
+//
 
 /api/orders - GET
 
