@@ -2,7 +2,7 @@
 // API endpoints 
 //
 
-/api/users - POST
+/api/users - POST ✅
 
 /api/users/users/me/ - GET ✅
 
