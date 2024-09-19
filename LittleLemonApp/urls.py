@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path
-from .views import MenuItemView, UserView
+from .views import UserView, MenuItemView, MenuItemDetailView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
@@ -11,4 +11,5 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     # API menu items
     path('api/menu-items', MenuItemView.as_view(), name='menu_item_list'),
+    path('api/menu-items/<int:pk>/', MenuItemDetailView.as_view(), name='menu_item_list'),
 ]

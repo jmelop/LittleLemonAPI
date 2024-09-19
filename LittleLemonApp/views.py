@@ -5,6 +5,22 @@ from .models import MenuItem
 from .serializers import MenuItemSerializer, UserSerializer
 from .permissions import IsManager, IsCustomerOrDeliveryCrew
 
+class UserView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        serializer = UserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def post(self, request, *args, **kwargs):
+        self.permission_classes = [AllowAny]
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 class MenuItemView(generics.ListAPIView, generics.ListCreateAPIView, generics.RetrieveUpdateDestroyAPIView):
     queryset = MenuItem.objects.all()
     serializer_class = MenuItemSerializer
@@ -34,19 +50,10 @@ class MenuItemView(generics.ListAPIView, generics.ListCreateAPIView, generics.Re
     def delete(self, request, *args, **kwargs):
         return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
     
-class UserView(generics.ListAPIView):
-    permission_classes = [IsAuthenticated]
-    
+class MenuItemDetailView(generics.RetrieveAPIView):
+    queryset = MenuItem.objects.all()
+    serializer_class = MenuItemSerializer
+
     def get(self, request, *args, **kwargs):
-        user = request.user
-        serializer = UserSerializer(user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    
-    def post(self, request, *args, **kwargs):
-        self.permission_classes = [AllowAny]
-        serializer = UserSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
-            return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+        if IsCustomerOrDeliveryCrew().has_permission(request, self) or IsManager().has_permission(request, self):
+            return self.retrieve(request, *args, **kwargs)
