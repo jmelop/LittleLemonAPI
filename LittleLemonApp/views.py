@@ -50,7 +50,7 @@ class MenuItemView(generics.ListAPIView, generics.ListCreateAPIView, generics.Re
     def delete(self, request, *args, **kwargs):
         return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
     
-class MenuItemDetailView(generics.RetrieveAPIView):
+class MenuItemDetailView(generics.RetrieveAPIView, generics.RetrieveUpdateDestroyAPIView):
     queryset = MenuItem.objects.all()
     serializer_class = MenuItemSerializer
 
@@ -59,21 +59,19 @@ class MenuItemDetailView(generics.RetrieveAPIView):
             return self.retrieve(request, *args, **kwargs)
     
     def post(self, request, *args, **kwargs):
-        if IsManager().has_permission(request, self):
-            return True
         return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
 
     def patch(self, request, *args, **kwargs):
         if IsManager().has_permission(request, self):
-            return True
+            return self.partial_update(request, *args, **kwargs)
         return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
     
     def put(self, request, *args, **kwargs):
         if IsManager().has_permission(request, self):
-            return True
+            return self.update(request, *args, **kwargs)
         return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
     
     def delete(self, request, *args, **kwargs):
         if IsManager().has_permission(request, self):
-            return True
+            return self.destroy(request, *args, **kwargs)
         return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
