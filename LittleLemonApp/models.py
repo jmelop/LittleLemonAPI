@@ -7,8 +7,3 @@ class MenuItem(models.Model):
     
     def __str__(self):
         return self.name
-
-class User(models.Model):
-    name = models.CharField(max_length=35)
-    email = models.CharField(max_length=25)
-    password = models.CharField(max_length=255, default='default_password')

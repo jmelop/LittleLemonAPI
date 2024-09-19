@@ -1,7 +1,8 @@
-from rest_framework import generics
+from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from .models import MenuItem
-from .serializers import MenuItemSerializer
+from .serializers import MenuItemSerializer, UserSerializer
 from .permissions import IsManager, IsCustomerOrDeliveryCrew
 
 class MenuItemListView(generics.ListAPIView):
@@ -15,3 +16,12 @@ class MenuItemListView(generics.ListAPIView):
         else:
             self.permission_classes = [IsAuthenticated, IsCustomerOrDeliveryCrew]
         return super(MenuItemListView, self).get_permissions()
+    
+class UserView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        serializer = UserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+        
