@@ -57,3 +57,23 @@ class MenuItemDetailView(generics.RetrieveAPIView):
     def get(self, request, *args, **kwargs):
         if IsCustomerOrDeliveryCrew().has_permission(request, self) or IsManager().has_permission(request, self):
             return self.retrieve(request, *args, **kwargs)
+    
+    def post(self, request, *args, **kwargs):
+        if IsManager().has_permission(request, self):
+            return True
+        return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
+
+    def patch(self, request, *args, **kwargs):
+        if IsManager().has_permission(request, self):
+            return True
+        return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
+    
+    def put(self, request, *args, **kwargs):
+        if IsManager().has_permission(request, self):
+            return True
+        return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
+    
+    def delete(self, request, *args, **kwargs):
+        if IsManager().has_permission(request, self):
+            return True
+        return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
