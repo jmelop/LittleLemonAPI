@@ -6,7 +6,7 @@
 
 /api/users/users/me/ - GET ✅
 
-/token/login/ - POST
+/token/login/ - POST ✅
 
 //
 // Menu-items endpoints
@@ -14,7 +14,7 @@
 
 /api/menu-items - GET ✅
 
-/api/menu-items - POST, PUT, PATCH, DELETE
+/api/menu-items - POST, PUT, PATCH, DELETE ✅
 
 /api/menu-items/{menuItem} - GET
 

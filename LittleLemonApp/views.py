@@ -5,18 +5,6 @@ from .models import MenuItem
 from .serializers import MenuItemSerializer, UserSerializer
 from .permissions import IsManager, IsCustomerOrDeliveryCrew
 
-class MenuItemListView(generics.ListAPIView):
-    queryset = MenuItem.objects.all()
-    serializer_class = MenuItemSerializer
-    permission_classes = [IsAuthenticated]
-    
-    def get_permissions(self):
-        if self.request.user.groups.filter(name='Manager').exists():
-            self.permission_classes = [IsAuthenticated, IsManager]
-        else:
-            self.permission_classes = [IsAuthenticated, IsCustomerOrDeliveryCrew]
-        return super(MenuItemListView, self).get_permissions()
-    
 class UserView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     
@@ -27,10 +15,63 @@ class UserView(generics.ListAPIView):
     
     def post(self, request, *args, **kwargs):
         self.permission_classes = [AllowAny]
-        print(request.data)
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
             return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+
+class MenuItemView(generics.ListAPIView, generics.ListCreateAPIView, generics.RetrieveUpdateDestroyAPIView):
+    queryset = MenuItem.objects.all()
+    serializer_class = MenuItemSerializer
+    
+    def get(self, request, *args, **kwargs):
+        if IsCustomerOrDeliveryCrew().has_permission(request, self) or IsManager().has_permission(request, self):
+            menu_items = MenuItem.objects.all()
+            serializer = MenuItemSerializer(menu_items, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
+    
+    def post(self, request, *args, **kwargs):
+        if IsManager().has_permission(request, self):
+            serializer = MenuItemSerializer(data=request.data)
+            if serializer.is_valid():
+                menuItem = serializer.save()
+                return Response(MenuItemSerializer(menuItem).data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
+
+    def patch(self, request, *args, **kwargs):
+        return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
+
+    def put(self, request, *args, **kwargs):
+        return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
+
+    def delete(self, request, *args, **kwargs):
+        return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
+    
+class MenuItemDetailView(generics.RetrieveAPIView, generics.RetrieveUpdateDestroyAPIView):
+    queryset = MenuItem.objects.all()
+    serializer_class = MenuItemSerializer
+
+    def get(self, request, *args, **kwargs):
+        if IsCustomerOrDeliveryCrew().has_permission(request, self) or IsManager().has_permission(request, self):
+            return self.retrieve(request, *args, **kwargs)
+    
+    def post(self, request, *args, **kwargs):
+        return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
+
+    def patch(self, request, *args, **kwargs):
+        if IsManager().has_permission(request, self):
+            return self.partial_update(request, *args, **kwargs)
+        return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
+    
+    def put(self, request, *args, **kwargs):
+        if IsManager().has_permission(request, self):
+            return self.update(request, *args, **kwargs)
+        return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
+    
+    def delete(self, request, *args, **kwargs):
+        if IsManager().has_permission(request, self):
+            return self.destroy(request, *args, **kwargs)
+        return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
