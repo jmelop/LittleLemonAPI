@@ -1,19 +1,17 @@
-from django.http import JsonResponse
-from django.views import View
-from .models import MenuItem, User
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
+from .models import MenuItem
+from .serializers import MenuItemSerializer
+from .permissions import IsManager, IsCustomerOrDeliveryCrew
 
-class MenuItemListView(View):
-    def get(self, request, *args, **kwargs):
-        menu_items = MenuItem.objects.all().values()
-        return JsonResponse(list(menu_items), safe=False, status=200)
+class MenuItemListView(generics.ListAPIView):
+    queryset = MenuItem.objects.all()
+    serializer_class = MenuItemSerializer
+    permission_classes = [IsAuthenticated]
     
-    def __str__(self):
-        return self.name
-
-class UsersView(View):
-    def get(self, request, *args, **kwargs):
-        user = User.objects.all().values()
-        return JsonResponse(list(user), safe=False, status=200)
-    
-    def __str__(self):
-        return self.name
+    def get_permissions(self):
+        if self.request.user.groups.filter(name='Manager').exists():
+            self.permission_classes = [IsAuthenticated, IsManager]
+        else:
+            self.permission_classes = [IsAuthenticated, IsCustomerOrDeliveryCrew]
+        return super(MenuItemListView, self).get_permissions()
