@@ -16,19 +16,19 @@
 
 /api/menu-items - POST, PUT, PATCH, DELETE ✅
 
-/api/menu-items/{menuItem} - GET
+/api/menu-items/{menuItem} - GET ✅
 
-/api/menu-items/{menuItem} - POST, PUT, PATCH, DELETE
+/api/menu-items/{menuItem} - POST, PUT, PATCH, DELETE ✅
 
 /api/menu-items - GET ✅
 
-/api/menu-items - POST
+/api/menu-items - POST ✅
 
-/api/menu-items/{menuItem} - GET
+/api/menu-items/{menuItem} - GET ✅
 
-/api/menu-items/{menuItem} - PUT, PATCH
+/api/menu-items/{menuItem} - PUT, PATCH ✅
 
-/api/menu-items/{menuItem} - DELETE
+/api/menu-items/{menuItem} - DELETE ✅
 
 //
 // User group management endpoints
