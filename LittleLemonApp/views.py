@@ -1,6 +1,8 @@
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from django.contrib.auth.models import User, Group
 from .models import MenuItem
 from .serializers import MenuItemSerializer, UserSerializer
 from .permissions import IsManager, IsCustomerOrDeliveryCrew
@@ -74,4 +76,22 @@ class MenuItemDetailView(generics.RetrieveAPIView, generics.RetrieveUpdateDestro
     def delete(self, request, *args, **kwargs):
         if IsManager().has_permission(request, self):
             return self.destroy(request, *args, **kwargs)
+        return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
+    
+class ManagerListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        if IsManager().has_permission(request, self):
+            try:
+                managers_group = Group.objects.get(name="Manager")
+            except Group.DoesNotExist:
+                return Response({"detail": "Manager group not found."}, status=404)
+            
+            managers = managers_group.user_set.all()
+            managers_data = [
+                {"id": user.id, "username": user.username, "email": user.email} for user in managers
+            ]
+            
+            return Response(managers_data, status=200)
         return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
