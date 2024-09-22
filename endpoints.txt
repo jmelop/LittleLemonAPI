@@ -50,28 +50,28 @@
 // Cart management endpoints 
 //
 
-/api/cart/menu-items - GET
+/api/cart/menu-items - GET ✅
 
-/api/cart/menu-items - POST
+/api/cart/menu-items - POST ✅
 
-/api/cart/menu-items - DELETE
+/api/cart/menu-items - DELETE ✅
 
 //
 // Order management endpoints
 //
 
-/api/orders - GET
+/api/orders - GET ✅
 
 /api/orders - POST
 
 /api/orders/{orderId} - GET
 
-/api/orders - GET
+/api/orders - GET ✅
 
 /api/orders/{orderId} - PUT, PATCH
 
 /api/orders/{orderId} - DELETE
 
-/api/orders - GET
+/api/orders - GET ✅
 
 /api/orders/{orderId} - PATCH

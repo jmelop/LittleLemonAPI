@@ -3,8 +3,8 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth.models import User, Group
-from .models import MenuItem, Cart, CartItem
-from .serializers import MenuItemSerializer, UserSerializer, CartMenuItemSerializer
+from .models import MenuItem, Cart, CartItem, Order
+from .serializers import MenuItemSerializer, UserSerializer, CartMenuItemSerializer, OrderItemSerializer, OrderSerializer
 from .permissions import IsManager, IsCustomerOrDeliveryCrew
 
 class UserView(generics.ListAPIView):
@@ -211,3 +211,17 @@ class CartMenuItemsView(generics.ListAPIView):
             return Response({'detail': 'All items deleted from the cart.'}, status=status.HTTP_200_OK)
         else:
             return Response({'detail': 'No items found in the cart.'}, status=status.HTTP_404_NOT_FOUND)
+
+class OrderMenuItemsView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        if IsManager().has_permission(request, self):
+            orders = Order.objects.all()
+            serializer = OrderSerializer(orders, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        elif IsCustomerOrDeliveryCrew().has_permission(request, self):
+                orders = Order.objects.filter(user=request.user)
+                serializer = OrderItemSerializer(orders, many=True)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({"detail": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
