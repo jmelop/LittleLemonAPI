@@ -36,7 +36,7 @@
 
 /api/groups/manager/users - GET ✅
 
-/api/groups/manager/users - POST
+/api/groups/manager/users - POST ✅
 
 /api/groups/manager/users/{userId} - DELETE
 
