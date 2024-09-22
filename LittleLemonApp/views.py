@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth.models import User, Group
-from .models import MenuItem, Cart
+from .models import MenuItem, Cart, CartItem
 from .serializers import MenuItemSerializer, UserSerializer, CartMenuItemSerializer
 from .permissions import IsManager, IsCustomerOrDeliveryCrew
 
@@ -195,10 +195,19 @@ class CartMenuItemsView(generics.ListAPIView):
         except Cart.DoesNotExist:
             return Response({"detail": "Cart not found."}, status=status.HTTP_404_NOT_FOUND)
         
-
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, *args, **kwargs):
+        user = request.user
+        cart_items = CartItem.objects.filter(cart__user=user)
+
+        if cart_items.exists():
+            cart_items.delete()
+            return Response({'detail': 'All items deleted from the cart.'}, status=status.HTTP_200_OK)
+        else:
+            return Response({'detail': 'No items found in the cart.'}, status=status.HTTP_404_NOT_FOUND)
