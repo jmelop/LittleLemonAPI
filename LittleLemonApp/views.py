@@ -166,3 +166,18 @@ class DeliveryCrewListView(APIView):
             
             user.groups.add(delivery_crew)
             return Response({"detail": f"User {user.username} added to Delivery crew group."}, status=status.HTTP_201_CREATED)
+        
+    def delete(self, request, user_id, *args, **kwargs):
+        if IsManager().has_permission(request, self):
+            try:
+                delivery_crew = Group.objects.get(name="Delivery crew")
+            except Group.DoesNotExist:
+                return Response({"detail": "Delivery crew group not found."}, status=404)
+
+            try:
+                user = User.objects.get(id=user_id)
+            except User.DoesNotExist:
+                return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+            
+            user.groups.remove(delivery_crew)
+            return Response({"detail": f"User {user.username} removed to Delivery crew group."}, status=status.HTTP_200_OK)
