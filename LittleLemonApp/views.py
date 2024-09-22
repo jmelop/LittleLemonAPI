@@ -3,8 +3,8 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth.models import User, Group
-from .models import MenuItem
-from .serializers import MenuItemSerializer, UserSerializer
+from .models import MenuItem, Cart
+from .serializers import MenuItemSerializer, UserSerializer, CartMenuItemSerializer
 from .permissions import IsManager, IsCustomerOrDeliveryCrew
 
 class UserView(generics.ListAPIView):
@@ -181,3 +181,24 @@ class DeliveryCrewListView(APIView):
             
             user.groups.remove(delivery_crew)
             return Response({"detail": f"User {user.username} removed to Delivery crew group."}, status=status.HTTP_200_OK)
+        
+class CartMenuItemsView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = CartMenuItemSerializer
+
+    def get(self, request, *args, **kwargs):
+        try:
+            cart = Cart.objects.get(user=request.user)
+            cart_items = cart.items.all()
+            serializer = CartMenuItemSerializer(cart_items, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Cart.DoesNotExist:
+            return Response({"detail": "Cart not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
