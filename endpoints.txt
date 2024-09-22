@@ -62,7 +62,7 @@
 
 /api/orders - GET ✅
 
-/api/orders - POST
+/api/orders - POST ✅
 
 /api/orders/{orderId} - GET
 
@@ -70,7 +70,7 @@
 
 /api/orders/{orderId} - PUT, PATCH
 
-/api/orders/{orderId} - DELETE
+/api/orders/{orderId} - DELETE ✅
 
 /api/orders - GET ✅
 

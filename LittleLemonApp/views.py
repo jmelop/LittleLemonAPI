@@ -3,9 +3,9 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth.models import User, Group
-from .models import MenuItem, Cart, CartItem, Order
+from .models import MenuItem, Cart, CartItem, Order, OrderItem
 from .serializers import MenuItemSerializer, UserSerializer, CartMenuItemSerializer, OrderItemSerializer, OrderSerializer
-from .permissions import IsManager, IsCustomerOrDeliveryCrew
+from .permissions import IsManager, IsCustomerOrDeliveryCrew, IsCustomer
 
 class UserView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
@@ -214,6 +214,7 @@ class CartMenuItemsView(generics.ListAPIView):
 
 class OrderMenuItemsView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
+    queryset = Order.objects.all()
 
     def get(self, request, *args, **kwargs):
         if IsManager().has_permission(request, self):
@@ -224,4 +225,33 @@ class OrderMenuItemsView(generics.ListAPIView):
                 orders = Order.objects.filter(user=request.user)
                 serializer = OrderItemSerializer(orders, many=True)
                 return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({"detail": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
+    
+    def post(self, request, *args, **kwargs):
+        if IsCustomer().has_permission(request, self):
+            user = request.user
+            cart_items = Cart.objects.filter(user=user)
+            if not cart_items.exists():
+                return Response({"detail": "No items in the cart."}, status=status.HTTP_400_BAD_REQUEST)
+            
+            order = Order.objects.create(user=user)
+            for cart_item in cart_items:
+                OrderItem.objects.create(
+                    order=order,
+                    menu_item=cart_item.menu_item,
+                    quantity=cart_item.quantity,
+                    price=cart_item.menu_item.price
+                )
+            cart_items.delete()
+            return Response({"detail": "Order created successfully."}, status=status.HTTP_201_CREATED)
+        return Response({"detail": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
+    
+    def delete(self, request, order_id, *args, **kwargs):
+        if IsManager().has_permission(request, self):
+            try:
+                order = Order.objects.get(id=order_id)
+                order.delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            except Order.DoesNotExist:
+                return Response({"detail": "Order not found."}, status=status.HTTP_404_NOT_FOUND)
         return Response({"detail": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
