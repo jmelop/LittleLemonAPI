@@ -128,7 +128,7 @@ class ManagerListView(APIView):
                 return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
             
             user.groups.remove(manager_group)
-            return Response({"detail": f"User {user.username} removed to Manager group."}, status=status.HTTP_201_CREATED)
+            return Response({"detail": f"User {user.username} removed to Manager group."}, status=status.HTTP_200_OK)
 
 class DeliveryCrewListView(APIView):
     permission_classes = [IsAuthenticated]
