@@ -38,7 +38,7 @@
 
 /api/groups/manager/users - POST ✅
 
-/api/groups/manager/users/{userId} - DELETE
+/api/groups/manager/users/{userId} - DELETE ✅
 
 /api/groups/delivery-crew/users - GET ✅
 
