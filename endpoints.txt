@@ -34,17 +34,17 @@
 // User group management endpoints
 //
 
-/api/groups/manager/users - GET
+/api/groups/manager/users - GET ✅
 
-/api/groups/manager/users - POST
+/api/groups/manager/users - POST ✅
 
-/api/groups/manager/users/{userId} - DELETE
+/api/groups/manager/users/{userId} - DELETE ✅
 
-/api/groups/delivery-crew/users - GET
+/api/groups/delivery-crew/users - GET ✅
 
-/api/groups/delivery-crew/users - POST
+/api/groups/delivery-crew/users - POST ✅
 
-/api/groups/delivery-crew/users/{userId} - DELETE
+/api/groups/delivery-crew/users/{userId} - DELETE ✅
 
 //
 // Cart management endpoints 
