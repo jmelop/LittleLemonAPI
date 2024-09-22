@@ -147,3 +147,22 @@ class DeliveryCrewListView(APIView):
             
             return Response(delivery_crew_group_data, status=200)
         return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
+    
+    def post(self, request, *args, **kwargs):
+        if IsManager().has_permission(request, self):
+            try:
+                delivery_crew = Group.objects.get(name="Delivery crew")
+            except Group.DoesNotExist:
+                return Response({"detail": "Delivery crew group not found."}, status=404)
+            
+            user_id = request.data.get('user_id')
+            if not user_id:
+                return Response({"detail": "User ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                user = User.objects.get(id=user_id)
+            except User.DoesNotExist:
+                return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+            
+            user.groups.add(delivery_crew)
+            return Response({"detail": f"User {user.username} added to Delivery crew group."}, status=status.HTTP_201_CREATED)
