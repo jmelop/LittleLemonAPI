@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path
-from .views import UserView, MenuItemView, MenuItemDetailView, ManagerListView, DeliveryCrewListView, CartMenuItemsView
+from .views import UserView, MenuItemView, MenuItemDetailView, ManagerListView, DeliveryCrewListView, CartMenuItemsView, OrderMenuItemsView, OrderItemDetailView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
@@ -19,4 +19,7 @@ urlpatterns = [
     path('api/groups/delivery-crew/users/<int:user_id>', DeliveryCrewListView.as_view(), name='delivery-crew_list_view'),
     # API cart management
     path('api/cart/menu-items', CartMenuItemsView.as_view(), name='cart_menu_items_view'),
+    # API order management
+    path('api/orders', OrderMenuItemsView.as_view(), name='order_menu_items_view'),
+    path('api/orders/<int:order_id>', OrderItemDetailView.as_view(), name='order_menu_items_view'),
 ]
