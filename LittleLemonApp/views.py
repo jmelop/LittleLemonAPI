@@ -230,19 +230,18 @@ class OrderMenuItemsView(generics.ListAPIView):
     def post(self, request, *args, **kwargs):
         if IsCustomer().has_permission(request, self):
             user = request.user
-            cart_items = Cart.objects.filter(user=user)
-            if not cart_items.exists():
+            cart = Cart.objects.filter(user=user).first()
+            if not cart or not cart.items.exists():
                 return Response({"detail": "No items in the cart."}, status=status.HTTP_400_BAD_REQUEST)
-            
+
             order = Order.objects.create(user=user)
-            for cart_item in cart_items:
+            for cart_item in cart.items.all():
                 OrderItem.objects.create(
                     order=order,
                     menu_item=cart_item.menu_item,
-                    quantity=cart_item.quantity,
-                    price=cart_item.menu_item.price
+                    quantity=cart_item.quantity
                 )
-            cart_items.delete()
+            cart.items.all().delete()
             return Response({"detail": "Order created successfully."}, status=status.HTTP_201_CREATED)
         return Response({"detail": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
     
@@ -254,4 +253,21 @@ class OrderMenuItemsView(generics.ListAPIView):
                 return Response(status=status.HTTP_204_NO_CONTENT)
             except Order.DoesNotExist:
                 return Response({"detail": "Order not found."}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"detail": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
+
+class OrderItemDetailView(generics.RetrieveAPIView, generics.RetrieveUpdateDestroyAPIView):
+    queryset = OrderItem.objects.all()
+    serializer_class = OrderItemSerializer
+
+    def get(self, request, order_id, *args, **kwargs):
+        if IsCustomer().has_permission(request, self):
+            try:
+                order_item = self.get_object()
+                if order_item.order.user != request.user:
+                    return Response({"detail": "Order does not belong to the current user."},
+                                    status=status.HTTP_403_FORBIDDEN)
+                serializer = self.get_serializer(order_item)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            except OrderItem.DoesNotExist:
+                return Response({"detail": "Order item not found."}, status=status.HTTP_404_NOT_FOUND)
         return Response({"detail": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
