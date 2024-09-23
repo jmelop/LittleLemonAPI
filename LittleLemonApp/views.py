@@ -1,7 +1,9 @@
-from rest_framework import generics, status
+from rest_framework import generics, status, filters
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.pagination import PageNumberPagination
+from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404
 from .models import MenuItem, Cart, CartItem, Order, OrderItem
@@ -27,13 +29,15 @@ class UserView(generics.ListAPIView):
 class MenuItemView(generics.ListAPIView, generics.ListCreateAPIView, generics.RetrieveUpdateDestroyAPIView):
     queryset = MenuItem.objects.all()
     serializer_class = MenuItemSerializer
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['name', 'price']
+    ordering_fields = ['name', 'price']
+    ordering = ['name']
     
     def get(self, request, *args, **kwargs):
-        if IsCustomerOrDeliveryCrew().has_permission(request, self) or IsManager().has_permission(request, self):
-            menu_items = MenuItem.objects.all()
-            serializer = MenuItemSerializer(menu_items, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
+            if IsCustomerOrDeliveryCrew().has_permission(request, self) or IsManager().has_permission(request, self):
+                return super().get(request, *args, **kwargs)
+            return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
     
     def post(self, request, *args, **kwargs):
         if IsManager().has_permission(request, self):
