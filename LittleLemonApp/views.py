@@ -1,7 +1,9 @@
-from rest_framework import generics, status
+from rest_framework import generics, status, filters
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.pagination import PageNumberPagination
+from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404
 from .models import MenuItem, Cart, CartItem, Order, OrderItem
@@ -27,13 +29,15 @@ class UserView(generics.ListAPIView):
 class MenuItemView(generics.ListAPIView, generics.ListCreateAPIView, generics.RetrieveUpdateDestroyAPIView):
     queryset = MenuItem.objects.all()
     serializer_class = MenuItemSerializer
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['name', 'price']
+    ordering_fields = ['name', 'price']
+    ordering = ['name']
     
     def get(self, request, *args, **kwargs):
-        if IsCustomerOrDeliveryCrew().has_permission(request, self) or IsManager().has_permission(request, self):
-            menu_items = MenuItem.objects.all()
-            serializer = MenuItemSerializer(menu_items, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
+            if IsCustomerOrDeliveryCrew().has_permission(request, self) or IsManager().has_permission(request, self):
+                return super().get(request, *args, **kwargs)
+            return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
     
     def post(self, request, *args, **kwargs):
         if IsManager().has_permission(request, self):
@@ -214,19 +218,30 @@ class CartMenuItemsView(generics.ListAPIView):
             return Response({'detail': 'No items found in the cart.'}, status=status.HTTP_404_NOT_FOUND)
 
 class OrderMenuItemsView(generics.ListAPIView):
-    permission_classes = [IsAuthenticated]
     queryset = Order.objects.all()
+    permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['status', 'delivery_crew', 'created_at']
+    ordering_fields = ['created_at', 'status', 'user']
+    ordering = ['created_at']
+    
+    def get_queryset(self):
+        return Order.objects.all()
 
     def get(self, request, *args, **kwargs):
         if IsManager().has_permission(request, self):
-            orders = Order.objects.all()
-            serializer = OrderSerializer(orders, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            queryset = self.get_queryset()
         elif IsCustomerOrDeliveryCrew().has_permission(request, self):
-                orders = Order.objects.filter(user=request.user)
-                serializer = OrderItemSerializer(orders, many=True)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response({"detail": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
+            queryset = self.get_queryset().filter(user=request.user)
+        else:
+            return Response({"detail": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
+        filtered_queryset = self.filter_queryset(queryset)
+        page = self.paginate_queryset(filtered_queryset)
+        if page is not None:
+            serializer = OrderSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = OrderSerializer(filtered_queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
     def post(self, request, *args, **kwargs):
         if IsCustomer().has_permission(request, self):
