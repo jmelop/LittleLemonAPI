@@ -25,7 +25,10 @@ class CartItem(models.Model):
         return f"{self.quantity} of {self.menu_item.name}"
 
 class Order(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    STATUS_CHOICES = [(0, 'Out for delivery'), (1, 'Delivered')]
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    delivery_crew = models.ForeignKey(User, related_name='delivery_orders', on_delete=models.SET_NULL, null=True, blank=True)
+    status = models.IntegerField(choices=STATUS_CHOICES, default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     
 class OrderItem(models.Model):
