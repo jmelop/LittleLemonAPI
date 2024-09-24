@@ -232,7 +232,7 @@ class OrderMenuItemsView(generics.ListAPIView):
         if IsManager().has_permission(request, self):
             queryset = self.get_queryset()
         elif IsCustomerOrDeliveryCrew().has_permission(request, self):
-            queryset = self.get_queryset().filter(user=request.user)
+            queryset = self.get_queryset().filter(delivery_crew_id=request.user.id)
         else:
             return Response({"detail": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
         filtered_queryset = self.filter_queryset(queryset)
