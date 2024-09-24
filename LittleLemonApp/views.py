@@ -8,7 +8,7 @@ from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404
 from .models import MenuItem, Cart, CartItem, Order, OrderItem
 from .serializers import MenuItemSerializer, UserSerializer, CartMenuItemSerializer, OrderItemSerializer, OrderSerializer
-from .permissions import IsDeliveryCrew, IsManager, IsCustomerOrDeliveryCrew, IsCustomer
+from .permissions import IsDeliveryCrew, IsManager, IsCustomerOrDeliveryCrew, IsCustomer, IsAdminUserOrManager
 
 class UserView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
@@ -35,12 +35,12 @@ class MenuItemView(generics.ListAPIView, generics.ListCreateAPIView, generics.Re
     ordering = ['name']
     
     def get(self, request, *args, **kwargs):
-            if IsCustomerOrDeliveryCrew().has_permission(request, self) or IsManager().has_permission(request, self):
+            if IsCustomerOrDeliveryCrew().has_permission(request, self) or IsAdminUserOrManager().has_permission(request, self):
                 return super().get(request, *args, **kwargs)
             return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
     
     def post(self, request, *args, **kwargs):
-        if IsManager().has_permission(request, self):
+        if IsAdminUserOrManager().has_permission(request, self):
             serializer = MenuItemSerializer(data=request.data)
             if serializer.is_valid():
                 menuItem = serializer.save()
@@ -84,10 +84,10 @@ class MenuItemDetailView(generics.RetrieveAPIView, generics.RetrieveUpdateDestro
         return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
     
 class ManagerListView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdminUserOrManager]
 
     def get(self, request, *args, **kwargs):
-        if IsManager().has_permission(request, self):
+        if IsAdminUserOrManager().has_permission(request, self):
             try:
                 managers_group = Group.objects.get(name="Manager")
             except Group.DoesNotExist:
@@ -102,7 +102,7 @@ class ManagerListView(APIView):
         return Response({'detail': 'Permission denied.'}, status=status.HTTP_403_FORBIDDEN)
     
     def post(self, request, *args, **kwargs):
-        if IsManager().has_permission(request, self):
+        if IsAdminUserOrManager().has_permission(request, self):
             try:
                 manager_group = Group.objects.get(name="Manager")
             except Group.DoesNotExist:
