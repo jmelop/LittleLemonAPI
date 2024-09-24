@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path
-from .views import UserView, MenuItemView, MenuItemDetailView, ManagerListView, DeliveryCrewListView, CartMenuItemsView, OrderMenuItemsView, OrderItemDetailView
+from .views import UserView, MenuItemView, MenuItemDetailView, ManagerListView, DeliveryCrewListView, CartMenuItemsView, OrderMenuItemsView, OrderItemDetailView, CategoryListCreateView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
@@ -10,7 +10,7 @@ urlpatterns = [
     path('auth/token/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     # API categories
-    #path('api/categories', MenuItemView.as_view(), name='menu_item_list'),
+    path('api/categories', CategoryListCreateView.as_view(), name='category_list'),
     # API menu items
     path('api/menu-items', MenuItemView.as_view(), name='menu_item_list'),
     path('api/menu-items/<int:pk>', MenuItemDetailView.as_view(), name='menu_item_list'),

@@ -6,8 +6,8 @@ from rest_framework.pagination import PageNumberPagination
 from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404
-from .models import MenuItem, Cart, CartItem, Order, OrderItem
-from .serializers import MenuItemSerializer, UserSerializer, CartMenuItemSerializer, OrderItemSerializer, OrderSerializer
+from .models import Category, MenuItem, Cart, CartItem, Order, OrderItem
+from .serializers import CategorySerializer, MenuItemSerializer, UserSerializer, CartMenuItemSerializer, OrderItemSerializer, OrderSerializer
 from .permissions import IsDeliveryCrew, IsManager, IsCustomerOrDeliveryCrew, IsCustomer, IsAdminUserOrManager
 
 class UserView(generics.ListAPIView):
@@ -134,6 +134,17 @@ class ManagerListView(APIView):
             
             user.groups.remove(manager_group)
             return Response({"detail": f"User {user.username} removed to Manager group."}, status=status.HTTP_200_OK)
+    
+class CategoryListCreateView(generics.ListCreateAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
 
 class DeliveryCrewListView(APIView):
     permission_classes = [IsAuthenticated]
