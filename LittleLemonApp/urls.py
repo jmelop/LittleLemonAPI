@@ -22,6 +22,6 @@ urlpatterns = [
     # API cart management
     path('api/cart/menu-items', CartMenuItemsView.as_view(), name='cart_menu_items_view'),
     # API order management
-    path('api/orders', OrderMenuItemsView.as_view(), name='order_menu_items_view'),
-    path('api/orders/<int:order_id>', OrderItemDetailView.as_view(), name='order_menu_items_view'),
+    path('api/cart/orders', OrderMenuItemsView.as_view(), name='order_menu_items_view'),
+    path('api/cart/orders/<int:order_id>', OrderItemDetailView.as_view(), name='order_menu_items_view'),
 ]
