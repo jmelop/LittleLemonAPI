@@ -254,7 +254,7 @@ class OrderMenuItemsView(generics.ListAPIView):
             for cart_item in cart.items.all():
                 OrderItem.objects.create(
                     order=order,
-                    menu_item=cart_item.menu_item,
+                    menuitem=cart_item.menuitem,
                     quantity=cart_item.quantity
                 )
             cart.items.all().delete()
