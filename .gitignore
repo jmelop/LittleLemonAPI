@@ -7,6 +7,9 @@ ENV/
 .venv/
 .ENV/
 
+# Project files
+notes.txt
+
 # Python files
 *.py[cod]
 __pycache__/

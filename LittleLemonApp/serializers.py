@@ -7,12 +7,12 @@ User = get_user_model()
 class MenuItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = MenuItem
-        fields = ['id', 'name', 'description', 'price']
+        fields = ['id', 'name', 'description', 'unit_price', 'featured']
 
 class CartMenuItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = CartItem
-        fields = ['menu_item', 'quantity']
+        fields = ['menuitem', 'quantity', 'unit_price']
     
     def create(self, validated_data):
         user = self.context['request'].user
@@ -20,8 +20,8 @@ class CartMenuItemSerializer(serializers.ModelSerializer):
         
         cart_item, created = CartItem.objects.update_or_create(
             cart=cart,
-            menu_item=validated_data['menu_item'],
-            defaults={'quantity': validated_data['quantity']}
+            menuitem=validated_data['menuitem'],
+            defaults={'quantity': validated_data['quantity'], 'unit_price': validated_data['unit_price']}
         )
         return cart_item
 
@@ -29,7 +29,7 @@ class CartMenuItemSerializer(serializers.ModelSerializer):
 class OrderItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderItem
-        fields = ['id', 'menu_item', 'quantity']
+        fields = ['id', 'menuitem', 'quantity']
 
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
