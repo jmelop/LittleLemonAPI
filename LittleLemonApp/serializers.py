@@ -7,7 +7,7 @@ User = get_user_model()
 class MenuItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = MenuItem
-        fields = ['id', 'name', 'description', 'price']
+        fields = ['id', 'name', 'description', 'price', 'featured']
 
 class CartMenuItemSerializer(serializers.ModelSerializer):
     class Meta:
